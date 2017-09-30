@@ -1,0 +1,18 @@
+{
+  "env": {
+    "development": {
+      "presets": [["babel-preset-env", { "targets": { "node": "current" } }]]
+    },
+    "test": {
+      "presets": [["babel-preset-env", { "targets": { "node": "4.3.0" } }]]
+    },
+    "production": {
+      "presets": [["babel-preset-env", { "targets": { "node": "4.3.0" } }]]
+    }
+  },
+  "plugins": [
+    "babel-plugin-transform-runtime",
+    "babel-plugin-add-module-exports",
+    "babel-plugin-transform-object-rest-spread"
+  ]
+}

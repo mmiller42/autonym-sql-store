@@ -1,0 +1,68 @@
+{
+  "name": "autonym-sql-store",
+  "version": "1.0.3",
+  "description": "Store constructor for Autonym models, powered by Bookshelf.js.",
+  "keywords": [
+    "autonym",
+    "sql",
+    "bookshelf",
+    "store"
+  ],
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "rm -rf lib && babel src --out-dir lib --source-maps --copy-files",
+    "lint": "eslint src test",
+    "precommit": "lint-staged",
+    "prettier": "prettier --write '{src/**/*.{js,json},*.js,.*rc,.*.json}'",
+    "postpublish": "create-github-release $TAG",
+    "test": "exit 0",
+    "watch": "npm run build -- --watch"
+  },
+  "lint-staged": {
+    "{src/**/*.{js,json},*.js,.*rc,.*.json}": [
+      "prettier --write",
+      "git add"
+    ],
+    "src/**/*.{js,json}": [
+      "eslint",
+      "git add"
+    ]
+  },
+  "engines": {
+    "node": ">=4.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmiller42/autonym-sql-store.git"
+  },
+  "author": "Matt Miller <me@mmiller.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mmiller42/autonym-sql-store/issues"
+  },
+  "homepage": "https://github.com/mmiller42/autonym-sql-store#readme",
+  "devDependencies": {
+    "autonym": "^1.0.3",
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^8.0.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "create-github-release": "^1.4.0",
+    "eslint": "^4.7.1",
+    "eslint-config-prettier": "^2.5.0",
+    "eslint-plugin-import": "^2.7.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^4.2.1",
+    "prettier": "^1.7.0"
+  },
+  "peerDependencies": {
+    "autonym": "^1.0.3"
+  },
+  "dependencies": {
+    "bookshelf": "^0.10.4",
+    "knex": "^0.13.0"
+  }
+}
