@@ -1,4 +1,5 @@
 import { difference, isPlainObject, reduce } from 'lodash'
+import { AutonymError } from 'autonym'
 
 export const SORT_REGEXP = /^([+-])(\S+)$/
 
@@ -34,7 +35,7 @@ export function mapKeysDeep(object, iterator) {
 
 export function parseSearch(search, { searchableProperties }) {
   if (!isPlainObject(search)) {
-    return {}
+    return []
   }
 
   return reduce(
@@ -48,11 +49,12 @@ export function parseSearch(search, { searchableProperties }) {
           value = query[operator]
         }
 
-        if (['=', '!=', '~', '!~'].contains(operator)) {
-          if (['~', '!~'].contains(operator)) {
+        if (['=', '!=', '~', '!~'].indexOf(operator) > -1) {
+          if (['~', '!~'].indexOf(operator) > -1) {
             value = `%${value}%`
+            operator = operator === '~' ? 'ILIKE' : 'NOT ILIKE'
           }
-          filters.push('where', property, operator, value === 'NULL' ? null : value)
+          filters.push(['where', property, operator, value === 'NULL' ? null : value])
         }
       }
       return filters
@@ -94,4 +96,14 @@ export function applyFilters(bsModel, filters = [], { serializeProperty }) {
     const [clause, property, ...restArgs] = filterArgs
     return instance.query(clause, serializeProperty(property), ...restArgs)
   }, bsModel)
+}
+
+export function transformError(err) {
+  if (['EmptyResponse', 'No Rows Deleted'].indexOf(err.message) > -1) {
+    return new AutonymError(AutonymError.NOT_FOUND, 'The requested resource does not exist.')
+  } else if (/invalid input syntax/.test(err.message)) {
+    return new AutonymError(AutonymError.BAD_REQUEST, 'The request had invalid data syntax.')
+  } else {
+    return err
+  }
 }
