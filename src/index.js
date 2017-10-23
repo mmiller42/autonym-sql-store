@@ -30,6 +30,7 @@ export default function createSqlStoreCreator(dbConfig) {
     const BsModel = bookshelf.Model.extend({ tableName: table, ...bsModelOptions })
 
     return {
+      getBsModel: () => BsModel,
       create: async data => {
         try {
           const result = await BsModel.forge(data).save(null, { method: 'insert' })
