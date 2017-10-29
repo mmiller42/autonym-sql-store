@@ -13,7 +13,8 @@ import createBookshelf from 'bookshelf'
 import createKnex from 'knex'
 
 export default function createSqlStoreCreator(dbConfig) {
-  const bookshelf = createBookshelf(createKnex(dbConfig))
+  const knex = createKnex(dbConfig)
+  const bookshelf = createBookshelf(knex)
   bookshelf.plugin('pagination')
 
   return function createSqlStore(config) {
@@ -31,6 +32,8 @@ export default function createSqlStoreCreator(dbConfig) {
 
     return {
       getBsModel: () => BsModel,
+      getBookshelf: () => bookshelf,
+      getKnex: () => knex,
       create: async data => {
         try {
           const result = await BsModel.forge(data).save(null, { method: 'insert' })
