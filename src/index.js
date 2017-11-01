@@ -30,6 +30,18 @@ export default function createSqlStoreCreator(dbConfig) {
     } = normalizeConfig(config)
     const BsModel = bookshelf.Model.extend({ tableName: table, ...bsModelOptions })
 
+    function prepareFindQuery(query, meta) {
+      const normalizedQuery = normalizeQuery(query, { searchableProperties, sort, limit })
+
+      const bsModel = applyFilters(
+        BsModel,
+        [...get(meta, 'filters', []), ...normalizedQuery.search, ...normalizedQuery.ids],
+        { serializeProperty }
+      ).query('orderBy', serializeProperty(normalizedQuery.sort.property), normalizedQuery.sort.direction)
+
+      return { normalizedQuery, bsModel }
+    }
+
     return {
       getBsModel: () => BsModel,
       getBookshelf: () => bookshelf,
@@ -44,13 +56,7 @@ export default function createSqlStoreCreator(dbConfig) {
       },
       find: async (query, meta) => {
         try {
-          const normalizedQuery = normalizeQuery(query, { searchableProperties, sort, limit })
-
-          const bsModel = applyFilters(
-            BsModel,
-            [...get(meta, 'filters', []), ...normalizedQuery.search, ...normalizedQuery.ids],
-            { serializeProperty }
-          ).query('orderBy', serializeProperty(normalizedQuery.sort.property), normalizedQuery.sort.direction)
+          const { normalizedQuery, bsModel } = prepareFindQuery(query, meta)
 
           let results = null
           if (limit) {
@@ -64,6 +70,15 @@ export default function createSqlStoreCreator(dbConfig) {
           }
 
           return results.toJSON()
+        } catch (err) {
+          throw transformError(err)
+        }
+      },
+      count: async (query, meta) => {
+        try {
+          const { bsModel } = prepareFindQuery(query, meta)
+
+          return await bsModel.count('id')
         } catch (err) {
           throw transformError(err)
         }
