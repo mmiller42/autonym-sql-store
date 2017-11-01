@@ -1,6 +1,6 @@
 {
   "name": "autonym-sql-store",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Store constructor for Autonym models, powered by Bookshelf.js.",
   "keywords": [
     "autonym",
