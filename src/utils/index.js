@@ -22,6 +22,10 @@ export function mapKeysDeep(object, iterator) {
   return reduce(
     object,
     (result, value, key) => {
+      const translatedKey = iterator(key)
+      if (translatedKey == null) {
+        return result
+      }
       if (Array.isArray(value)) {
         result[iterator(key)] = value.map(v => mapKeysDeep(v, iterator))
       } else {
