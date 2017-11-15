@@ -30,14 +30,22 @@ export default function createSqlStoreCreator(dbConfig) {
     } = normalizeConfig(config)
     const BsModel = bookshelf.Model.extend({ tableName: table, ...bsModelOptions })
 
-    function prepareFindQuery(query, meta) {
+    function prepareFindQuery(query, meta, isCountQuery = false) {
       const normalizedQuery = normalizeQuery(query, { searchableProperties, sort, limit })
 
-      const bsModel = applyFilters(
+      let bsModel = applyFilters(
         BsModel,
         [...get(meta, 'filters', []), ...normalizedQuery.search, ...normalizedQuery.ids],
         { serializeProperty }
-      ).query('orderBy', serializeProperty(normalizedQuery.sort.property), normalizedQuery.sort.direction)
+      )
+
+      if (!isCountQuery) {
+        bsModel = bsModel.query(
+          'orderBy',
+          serializeProperty(normalizedQuery.sort.property),
+          normalizedQuery.sort.direction
+        )
+      }
 
       return { normalizedQuery, bsModel }
     }
@@ -76,7 +84,7 @@ export default function createSqlStoreCreator(dbConfig) {
       },
       count: async (query, meta) => {
         try {
-          const { bsModel } = prepareFindQuery(query, meta)
+          const { bsModel } = prepareFindQuery(query, meta, true)
 
           return await bsModel.count('id')
         } catch (err) {
