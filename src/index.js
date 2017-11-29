@@ -8,7 +8,7 @@ import {
   parseSort,
   transformError,
 } from './utils'
-import { camelCase, defaultsDeep, get, isPlainObject, snakeCase } from 'lodash'
+import { camelCase, defaultsDeep, get, isEmpty, isPlainObject, snakeCase } from 'lodash'
 import createBookshelf from 'bookshelf'
 import createKnex from 'knex'
 
@@ -50,7 +50,7 @@ export default function createSqlStoreCreator(dbConfig) {
       return { normalizedQuery, bsModel }
     }
 
-    return {
+    const store = {
       getBsModel: () => BsModel,
       getBookshelf: () => bookshelf,
       getKnex: () => knex,
@@ -108,6 +108,10 @@ export default function createSqlStoreCreator(dbConfig) {
         }
       },
       findOneAndUpdate: async (id, data, completeData, meta = {}) => {
+        if (isEmpty(data)) {
+          return store.findOne(id, meta)
+        }
+
         try {
           const bsModel = applyFilters(
             new BsModel(),
@@ -149,6 +153,8 @@ export default function createSqlStoreCreator(dbConfig) {
       serialize,
       unserialize,
     }
+
+    return store
   }
 }
 
