@@ -42,7 +42,7 @@
   },
   "homepage": "https://github.com/mmiller42/autonym-sql-store#readme",
   "devDependencies": {
-    "autonym": "^1.0.3",
+    "autonym": "^1.3.2",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
     "babel-eslint": "^8.0.0",
