@@ -107,6 +107,13 @@ export function transformError(err) {
     return new AutonymError(AutonymError.NOT_FOUND, 'The requested resource does not exist.')
   } else if (/invalid input syntax/.test(err.message)) {
     return new AutonymError(AutonymError.BAD_REQUEST, 'The request had invalid data syntax.')
+  } else if (err.constraint) {
+    const [, type, fields] = err.constraint.split(':')
+    if (type === 'unique') {
+      return new AutonymError(AutonymError.UNPROCESSABLE_ENTITY, `The ${fields} must be unique.`)
+    } else {
+      return err
+    }
   } else {
     return err
   }
