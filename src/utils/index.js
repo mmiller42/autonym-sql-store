@@ -72,13 +72,23 @@ export function parseSort(sortQuery) {
     return null
   }
 
-  const match = sortQuery.match(SORT_REGEXP)
-  if (match) {
-    const [, direction, property] = match
-    return { direction: direction === '+' ? 'ASC' : 'DESC', property }
-  }
+  const pieces = sortQuery.split(',')
 
-  return null
+  const sorts = pieces.map(piece => {
+    const match = piece.match(SORT_REGEXP)
+    if (match) {
+      const [, direction, property] = match
+      return { direction: direction === '+' ? 'ASC' : 'DESC', property }
+    } else {
+      return null
+    }
+  })
+
+  if (sorts.find(sort => sort === null)) {
+    return null
+  } else {
+    return sorts
+  }
 }
 
 export function parseIds(ids) {

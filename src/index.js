@@ -40,11 +40,9 @@ export default function createSqlStoreCreator(dbConfig) {
       )
 
       if (!isCountQuery) {
-        bsModel = bsModel.query(
-          'orderBy',
-          serializeProperty(normalizedQuery.sort.property),
-          normalizedQuery.sort.direction
-        )
+        normalizedQuery.sort.forEach(({ property, direction }) => {
+          bsModel = bsModel.query('orderBy', serializeProperty(property), direction)
+        })
       }
 
       return { normalizedQuery, bsModel }
@@ -173,7 +171,10 @@ function normalizeConfig(config) {
       throw new TypeError(`config.searchableProperties[${i}] must be a non-empty string.`)
     }
   })
-  if (config.sort !== undefined && (typeof config.sort !== 'string' || !SORT_REGEXP.test(config.sort))) {
+  if (
+    config.sort !== undefined &&
+    (typeof config.sort !== 'string' || !SORT_REGEXP.split(',').every(piece => piece.test(config.sort)))
+  ) {
     throw new TypeError('config.sort must be a string matching ^[+-]\\S+$ or undefined.')
   }
   if (
